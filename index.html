@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CredenceX — Insurance Co-Pilot</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/main.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- BACKGROUND GRID EFFECT -->
+<div class="bg-grid"></div>
+
+<!-- 🌌 NAVBAR -->
+<nav class="glass-nav">
+    <div class="container d-flex align-items-center justify-content-between">
+        <div class="brand-wrapper">
+            <h3 class="brand-title">Credence<span class="text-gradient">X</span></h3>
+            <span class="brand-sub">Intelligent Policy Analysis</span>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span> System Online
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container main-container mt-5">
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-glass fade-in-up">
+                
+                <div class="header-section mb-4">
+                    <h2 class="section-title">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Analyze & Compare
+                    </h2>
+                    <p class="text-muted">Upload your policy documents for AI-driven insights.</p>
+                </div>
+
+                <!-- Insurance Type -->
+                <div class="input-group-custom mb-4">
+                    <label class="label">Select Insurance Type</label>
+                    <select id="insurance_type" class="form-select glass-input">
+                        <option value="Health">Health Insurance</option>
+                        <option value="Life">Life Insurance</option>
+                        <option value="Home">Home Insurance</option>
+                        <option value="Motor">Motor Insurance</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Inputs -->
+                <div id="healthInputs" class="dynamic-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="label">Proposer Age</label>
+                            <input id="age" type="number" class="form-control glass-input mb-3" value="35">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label">Family Members</label>
+                            <input id="dependents" type="number" class="form-control glass-input mb-3" value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="lifeInputs" class="dynamic-section" style="display:none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="label">Current Age</label>
+                            <input id="life_age" type="number" class="form-control glass-input mb-3" value="30">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label">Annual Income (₹)</label>
+                            <input id="annual_income" type="number" class="form-control glass-input mb-3" value="600000">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="assetInputs" class="dynamic-section" style="display:none;">
+                    <label class="label">Estimated Asset Value (₹)</label>
+                    <input id="asset_value" type="number" class="form-control glass-input mb-3" value="500000">
+                </div>
+
+                <!-- File Upload -->
+                <div class="upload-area mb-4">
+                    <label class="label mb-2">Policy Documents (PDF)</label>
+                    <div class="file-drop-zone">
+                        <input id="pdfs" type="file" multiple accept="application/pdf" class="file-input">
+                        <div class="drop-message">
+                            <i class="bi bi-cloud-arrow-up-fill fs-3 mb-2"></i>
+                            <span>Click to upload or drag files here</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="analyzeBtn" class="btn glass-btn w-100 py-3">
+                    <i class="bi bi-cpu-fill me-2"></i> Initialize Analysis
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- OUTPUT SECTION -->
+<div id="results" class="container mt-5 mb-5" style="display:none;">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="section-title text-gradient">📊 Comparison Dashboard</h2>
+        <span class="badge badge-tech">AI Processed</span>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="glass-card p-4 mb-5">
+        <h5 class="card-label">Visual Comparison</h5>
+        <div class="chart-container">
+            <img id="chartImg" class="img-fluid rounded shadow-lg" alt="Analysis Chart" />
+        </div>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="glass-card p-4">
+        <h5 class="card-label mb-3">Extracted Policy Data</h5>
+        <div id="parsedData" class="glass-table table-responsive"></div>
+    
+        <button id="downloadPDF" class="btn glass-btn-secondary w-100 mt-4">
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i> Download Comprehensive Report
+        </button>
+    </div>
+
+</div>
+
+<!-- FLOATING CHAT BUTTON -->
+<button id="chatButton" class="chat-fab">
+    <div class="chat-icon-wrapper">
+        <i class="bi bi-stars"></i>
+    </div>
+    <span class="tooltip-text">AI Assistant</span>
+</button>
+
+<!-- CHAT MODAL -->
+<div class="modal fade" id="chatModal">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        
+        <!-- 🔴 EMBEDDED STYLES: This fixes the user/bot messages without changing main.css -->
+        <style>
+            /* User Message (Right Side, Blue) */
+            .chat-bubble-user {
+                background: #06b6d4 !important; /* Cyan Blue */
+                color: white !important;
+                padding: 12px 18px;
+                border-radius: 14px 14px 0 14px;
+                margin: 10px 0 10px auto; /* Pushes to the right */
+                width: fit-content;
+                max-width: 80%;
+                box-shadow: 0 4px 10px rgba(6, 182, 212, 0.2);
+                font-size: 0.95rem;
+                clear: both;
+                display: block;
+            }
+
+            /* Bot Message (Left Side, White/Grey) */
+            .chat-bubble-bot {
+                background: #ffffff !important;
+                color: #1e293b !important; /* Dark Text */
+                border: 1px solid #e2e8f0;
+                padding: 12px 18px;
+                border-radius: 14px 14px 14px 0;
+                margin: 10px 0;
+                width: fit-content;
+                max-width: 80%;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                font-size: 0.95rem;
+                clear: both;
+                display: block;
+            }
+        </style>
+
+        <div class="modal-content glass-modal" style="color: #1e293b; border: 1px solid rgba(255,255,255,0.4);">
+
+            <!-- HEADER -->
+            <div class="modal-header border-0" style="border-bottom: 1px solid rgba(0,0,0,0.05) !important; padding: 20px 25px;">
+                <div class="d-flex align-items-center">
+                    <div style="background: rgba(6, 182, 212, 0.1); padding: 8px; border-radius: 50%; margin-right: 12px;">
+                        <i class="bi bi-robot fs-4 text-cyan" style="color: #06b6d4;"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold" style="margin: 0;">Policy Assistant AI</h5>
+                        <small class="text-muted" style="font-size: 0.8rem;">Online | Ready to help</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" style="filter: none;" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- CHAT AREA CONTAINER -->
+            <div class="modal-body" style="padding: 0; background: #f8fafc;">
+                <!-- Inner container with white background for clarity -->
+                <div class="p-4" style="height: 55vh; overflow-y: auto; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
+                    <div id="chatArea">
+                        
+                        <!-- Initial Welcome Message -->
+                        <div class="chat-bubble-bot">
+                            <i class="bi bi-stars text-warning me-2"></i>
+                            <strong>Hello!</strong> I am CredenceX AI. Ask me anything about the policies you just uploaded.
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- INPUT CONTAINER -->
+            <div class="modal-footer border-0" style="padding: 15px 25px; background: white; border-top: 1px solid #e2e8f0;">
+                <div class="input-group w-100 shadow-sm" style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                    <input id="chatInput" class="form-control" style="border: none; padding: 15px; background: white; color: #333;" placeholder="Type your query here...">
+                    <button id="sendChat" class="btn" style="background: #06b6d4; color: white; padding: 0 25px; border: none; font-weight: 600;">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="/static/chat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Dynamic UI Logic
+document.getElementById("insurance_type").addEventListener("change", () => {
+    let v = insurance_type.value;
+    const fadeElement = (el, show) => {
+        el.style.display = show ? "block" : "none";
+        if(show) el.classList.add('fade-in');
+    };
+
+    fadeElement(healthInputs, v === "Health");
+    fadeElement(lifeInputs, v === "Life");
+    fadeElement(assetInputs, v === "Motor" || v === "Home");
+});
+</script>
+
+</body>
+</html>
